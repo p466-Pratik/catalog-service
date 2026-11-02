@@ -21,6 +21,10 @@ import org.springframework.http.MediaType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+
 @WebMvcTest(BookController.class)
 class BookControllerMvcTests {
 
@@ -82,5 +86,65 @@ void whenPostInvalidBookThenShouldReturn400() throws Exception {
                     .content(invalidBookJson)
         )
         .andExpect(status().isBadRequest());
-}
+    }
+
+    @Test
+void whenPutExistingBookThenShouldReturn200() throws Exception {
+
+    String isbn = "1234567890";
+
+    given(bookService.existsByIsbn(isbn))
+            .willReturn(true);
+
+    given(bookService.editBookDetails(any(), any()))
+            .willReturn(
+                new Book(isbn, "Updated", "Author", 12.99)
+            );
+
+    String bookJson = """
+        {
+          "isbn": "1234567890",
+          "title": "Updated",
+          "author": "Author",
+          "price": 12.99
+        }
+        """;
+
+    mockMvc.perform(
+            put("/books/" + isbn)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(bookJson)
+        )
+        .andExpect(status().isOk());
+    }
+
+    @Test
+void whenPutMissingBookThenShouldReturn201() throws Exception {
+
+    String isbn = "1234567890";
+
+    given(bookService.existsByIsbn(isbn))
+            .willReturn(false);
+
+    given(bookService.editBookDetails(any(), any()))
+            .willReturn(
+                new Book(isbn, "Created", "Author", 12.99)
+            );
+
+    String bookJson = """
+        {
+          "isbn": "1234567890",
+          "title": "Created",
+          "author": "Author",
+          "price": 12.99
+        }
+        """;
+
+    mockMvc.perform(
+            put("/books/" + isbn)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(bookJson)
+        )
+        .andExpect(status().isCreated());
+    }
 }

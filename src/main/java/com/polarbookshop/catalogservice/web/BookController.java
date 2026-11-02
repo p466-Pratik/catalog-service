@@ -6,6 +6,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.http.ResponseEntity;
+
 @RestController
 @RequestMapping("books")
 public class BookController {
@@ -39,10 +41,19 @@ public class BookController {
     }
 
     @PutMapping("{isbn}")
-    public Book put(
-            @PathVariable String isbn,
-            @Valid @RequestBody Book book) {
+    public ResponseEntity<Book> put(
+        @PathVariable String isbn,
+        @Valid @RequestBody Book book) {
 
-        return bookService.editBookDetails(isbn, book);
+    boolean existed = bookService.existsByIsbn(isbn);
+
+    Book savedBook = bookService.editBookDetails(isbn, book);
+
+    if (existed) {
+        return ResponseEntity.ok(savedBook);
+    }
+
+    return ResponseEntity.status(HttpStatus.CREATED)
+            .body(savedBook);
     }
 }

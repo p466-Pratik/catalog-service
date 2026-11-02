@@ -1,29 +1,23 @@
 package com.polarbookshop.catalogservice.web;
 
+import com.polarbookshop.catalogservice.domain.Book;
+import com.polarbookshop.catalogservice.domain.BookAlreadyExistsException;
 import com.polarbookshop.catalogservice.domain.BookNotFoundException;
 import com.polarbookshop.catalogservice.domain.BookService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import com.polarbookshop.catalogservice.domain.Book;
-import com.polarbookshop.catalogservice.domain.BookAlreadyExistsException;
-
-import org.springframework.http.MediaType;
-
-import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BookController.class)
 class BookControllerMvcTests {
@@ -46,105 +40,134 @@ class BookControllerMvcTests {
     }
 
     @Test
-void whenPostDuplicateBookThenShouldReturn422() throws Exception {
+    void whenPostDuplicateBookThenShouldReturn422() throws Exception {
+        String isbn = "0306406152";
 
-    given(bookService.addBookToCatalog(any(Book.class)))
-            .willThrow(new BookAlreadyExistsException("1234567890"));
+        given(bookService.addBookToCatalog(any(Book.class)))
+                .willThrow(new BookAlreadyExistsException(isbn));
 
-    String bookJson = """
-        {
-          "isbn": "1234567890",
-          "title": "Title",
-          "author": "Author",
-          "price": 9.90
-        }
-        """;
+        String bookJson = """
+            {
+              "isbn": "0306406152",
+              "title": "Title",
+              "author": "Author",
+              "price": 9.90
+            }
+            """;
 
-    mockMvc.perform(
-            post("/books")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(bookJson)
+        mockMvc.perform(
+                post("/books")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bookJson)
         )
         .andExpect(status().isUnprocessableEntity());
-}
+    }
 
-@Test
-void whenPostInvalidBookThenShouldReturn400() throws Exception {
+    @Test
+    void whenPostInvalidBookThenShouldReturn400() throws Exception {
 
-    String invalidBookJson = """
-        {
-          "isbn": "ABC",
-          "title": "",
-          "author": "Author",
-          "price": 9.90
-        }
-        """;
+        String invalidBookJson = """
+            {
+              "isbn": "ABC",
+              "title": "",
+              "author": "Author",
+              "price": 9.90
+            }
+            """;
 
-    mockMvc.perform(
-            post("/books")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(invalidBookJson)
+        mockMvc.perform(
+                post("/books")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidBookJson)
         )
         .andExpect(status().isBadRequest());
     }
 
     @Test
-void whenPutExistingBookThenShouldReturn200() throws Exception {
+    void whenPutExistingBookThenShouldReturn200() throws Exception {
+        String isbn = "0306406152";
 
-    String isbn = "1234567890";
+        given(bookService.existsByIsbn(isbn))
+                .willReturn(true);
 
-    given(bookService.existsByIsbn(isbn))
-            .willReturn(true);
+        given(bookService.editBookDetails(any(), any()))
+                .willReturn(
+                        new Book(
+                                isbn,
+                                "Updated",
+                                "Author",
+                                12.99
+                        )
+                );
 
-    given(bookService.editBookDetails(any(), any()))
-            .willReturn(
-                new Book(isbn, "Updated", "Author", 12.99)
-            );
+        String bookJson = """
+            {
+              "isbn": "0306406152",
+              "title": "Updated",
+              "author": "Author",
+              "price": 12.99
+            }
+            """;
 
-    String bookJson = """
-        {
-          "isbn": "1234567890",
-          "title": "Updated",
-          "author": "Author",
-          "price": 12.99
-        }
-        """;
-
-    mockMvc.perform(
-            put("/books/" + isbn)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(bookJson)
+        mockMvc.perform(
+                put("/books/" + isbn)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bookJson)
         )
         .andExpect(status().isOk());
     }
 
     @Test
-void whenPutMissingBookThenShouldReturn201() throws Exception {
+    void whenPutMissingBookThenShouldReturn201() throws Exception {
+        String isbn = "9780306406157";
 
-    String isbn = "1234567890";
+        given(bookService.existsByIsbn(isbn))
+                .willReturn(false);
 
-    given(bookService.existsByIsbn(isbn))
-            .willReturn(false);
+        given(bookService.editBookDetails(any(), any()))
+                .willReturn(
+                        new Book(
+                                isbn,
+                                "Created",
+                                "Author",
+                                12.99
+                        )
+                );
 
-    given(bookService.editBookDetails(any(), any()))
-            .willReturn(
-                new Book(isbn, "Created", "Author", 12.99)
-            );
+        String bookJson = """
+            {
+              "isbn": "9780306406157",
+              "title": "Created",
+              "author": "Author",
+              "price": 12.99
+            }
+            """;
 
-    String bookJson = """
-        {
-          "isbn": "1234567890",
-          "title": "Created",
-          "author": "Author",
-          "price": 12.99
-        }
-        """;
-
-    mockMvc.perform(
-            put("/books/" + isbn)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(bookJson)
+        mockMvc.perform(
+                put("/books/" + isbn)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bookJson)
         )
         .andExpect(status().isCreated());
+    }
+
+    @Test
+    void whenPutPathAndBodyIsbnDifferThenShouldReturn400() throws Exception {
+
+        String bookJson = """
+            {
+              "isbn": "9780306406157",
+              "title": "Title",
+              "author": "Author",
+              "price": 9.90
+            }
+            """;
+
+        mockMvc.perform(
+                put("/books/0306406152")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bookJson)
+        )
+        .andExpect(status().isBadRequest());
     }
 }

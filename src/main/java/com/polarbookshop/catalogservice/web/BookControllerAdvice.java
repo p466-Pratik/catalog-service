@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.polarbookshop.catalogservice.domain.BookIsbnMismatchException;
+
 @RestControllerAdvice
 public class BookControllerAdvice {
 
@@ -49,4 +51,10 @@ public class BookControllerAdvice {
 
         return errors;
     }
+
+    @ExceptionHandler(BookIsbnMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    String bookIsbnMismatchHandler(BookIsbnMismatchException ex) {
+        return ex.getMessage();
+    }   
 }

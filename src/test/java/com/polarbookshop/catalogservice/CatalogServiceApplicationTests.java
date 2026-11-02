@@ -21,7 +21,7 @@ class CatalogServiceApplicationTests {
     void whenPostRequestThenBookCreated() {
 
         var expected = new Book(
-                "1231231231",
+                "0306406152",
                 "Title",
                 "Author",
                 9.90

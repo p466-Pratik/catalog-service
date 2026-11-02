@@ -1,12 +1,14 @@
 package com.polarbookshop.catalogservice.web;
 
 import com.polarbookshop.catalogservice.domain.Book;
+import com.polarbookshop.catalogservice.domain.BookIsbnMismatchException;
 import com.polarbookshop.catalogservice.domain.BookService;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("books")
@@ -42,18 +44,31 @@ public class BookController {
 
     @PutMapping("{isbn}")
     public ResponseEntity<Book> put(
-        @PathVariable String isbn,
-        @Valid @RequestBody Book book) {
+            @PathVariable String isbn,
+            @Valid @RequestBody Book book) {
 
-    boolean existed = bookService.existsByIsbn(isbn);
+        if (!isbn.equals(book.isbn())) {
+            throw new BookIsbnMismatchException(
+                    isbn,
+                    book.isbn()
+            );
+        }
 
-    Book savedBook = bookService.editBookDetails(isbn, book);
+        boolean existed =
+                bookService.existsByIsbn(isbn);
 
-    if (existed) {
-        return ResponseEntity.ok(savedBook);
-    }
+        Book savedBook =
+                bookService.editBookDetails(
+                        isbn,
+                        book
+                );
 
-    return ResponseEntity.status(HttpStatus.CREATED)
-            .body(savedBook);
+        if (existed) {
+            return ResponseEntity.ok(savedBook);
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(savedBook);
     }
 }

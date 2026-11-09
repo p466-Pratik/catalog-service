@@ -24,7 +24,7 @@ class BookValidationTests {
 
     @Test
     void whenAllFieldsCorrectThenValidationSucceeds() {
-        var book = new Book(
+        var book = Book.of(
                 "0306406152",
                 "Title",
                 "Author",
@@ -39,7 +39,7 @@ class BookValidationTests {
 
     @Test
     void whenIsbnDefinedButIncorrectThenValidationFails() {
-        var book = new Book(
+        var book = Book.of(
                 "a234567890",
                 "Title",
                 "Author",
@@ -56,7 +56,7 @@ class BookValidationTests {
 
     @Test
     void whenTitleBlankThenValidationFails() {
-        var book = new Book(
+        var book = Book.of(
                 "0306406152",
                 "",
                 "Author",
@@ -72,7 +72,7 @@ class BookValidationTests {
 
     @Test
     void whenAuthorBlankThenValidationFails() {
-        var book = new Book(
+        var book = Book.of(
                 "0306406152",
                 "Title",
                 "",
@@ -88,7 +88,7 @@ class BookValidationTests {
 
     @Test
     void whenPriceMissingThenValidationFails() {
-        var book = new Book(
+        var book = Book.of(
                 "0306406152",
                 "Title",
                 "Author",
@@ -104,7 +104,7 @@ class BookValidationTests {
 
     @Test
     void whenPriceZeroThenValidationFails() {
-        var book = new Book(
+        var book = Book.of(
                 "0306406152",
                 "Title",
                 "Author",
@@ -122,7 +122,7 @@ class BookValidationTests {
 
     @Test
     void whenIsbn10CheckDigitValidThenValidationSucceeds() {
-        var book = new Book(
+        var book = Book.of(
                 "0306406152",
                 "Title",
                 "Author",
@@ -136,7 +136,7 @@ class BookValidationTests {
 
     @Test
     void whenIsbn10CheckDigitInvalidThenValidationFails() {
-        var book = new Book(
+        var book = Book.of(
                 "0306406153",
                 "Title",
                 "Author",
@@ -154,7 +154,7 @@ class BookValidationTests {
 
     @Test
     void whenIsbn13CheckDigitValidThenValidationSucceeds() {
-        var book = new Book(
+        var book = Book.of(
                 "9780306406157",
                 "Title",
                 "Author",
@@ -168,7 +168,7 @@ class BookValidationTests {
 
     @Test
     void whenIsbn13CheckDigitInvalidThenValidationFails() {
-        var book = new Book(
+        var book = Book.of(
                 "9780306406158",
                 "Title",
                 "Author",

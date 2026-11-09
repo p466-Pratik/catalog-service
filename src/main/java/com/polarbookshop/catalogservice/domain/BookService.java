@@ -31,17 +31,19 @@ public class BookService {
     public void removeBookFromCatalog(String isbn) {
         bookRepository.deleteByIsbn(isbn);
     }
-
+    
     public Book editBookDetails(String isbn, Book book) {
-
         return bookRepository.findByIsbn(isbn)
                 .map(existing -> {
-
                     var updated = new Book(
+                            existing.id(),
                             existing.isbn(),
                             book.title(),
                             book.author(),
-                            book.price()
+                            book.price(),
+                            existing.createdDate(),
+                            existing.lastModifiedDate(),
+                            existing.version()
                     );
 
                     return bookRepository.save(updated);

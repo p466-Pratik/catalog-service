@@ -92,7 +92,7 @@ class BookControllerMvcTests {
 
         given(bookService.editBookDetails(any(), any()))
                 .willReturn(
-                        new Book(
+                        Book.of(
                                 isbn,
                                 "Updated",
                                 "Author",
@@ -126,7 +126,7 @@ class BookControllerMvcTests {
 
         given(bookService.editBookDetails(any(), any()))
                 .willReturn(
-                        new Book(
+                        Book.of(
                                 isbn,
                                 "Created",
                                 "Author",

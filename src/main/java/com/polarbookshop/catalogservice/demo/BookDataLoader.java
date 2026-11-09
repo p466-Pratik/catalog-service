@@ -1,4 +1,7 @@
+
 package com.polarbookshop.catalogservice.demo;
+
+import java.util.List;
 
 import com.polarbookshop.catalogservice.domain.Book;
 import com.polarbookshop.catalogservice.domain.BookRepository;
@@ -20,22 +23,23 @@ public class BookDataLoader {
 
     @EventListener(ApplicationReadyEvent.class)
     public void loadBookTestData() {
-        bookRepository.save(
-                new Book(
-                        "1234567891",
-                        "Northern Lights",
-                        "Lyra Silverstar",
-                        9.90
-                )
+
+        bookRepository.deleteAll();
+
+        var book1 = Book.of(
+                "0306406152",
+                "Northern Lights",
+                "Lyra Silverstar",
+                9.90
         );
 
-        bookRepository.save(
-                new Book(
-                        "1234567892",
-                        "Polar Journey",
-                        "Iorek Polarson",
-                        12.90
-                )
+        var book2 = Book.of(
+                "9780306406157",
+                "Polar Journey",
+                "Iorek Polarson",
+                12.90
         );
+
+        bookRepository.saveAll(List.of(book1, book2));
     }
 }

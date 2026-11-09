@@ -28,7 +28,8 @@ class BookValidationTests {
                 "0306406152",
                 "Title",
                 "Author",
-                9.90
+                9.90,
+                null
         );
 
         Set<ConstraintViolation<Book>> violations =
@@ -43,7 +44,8 @@ class BookValidationTests {
                 "a234567890",
                 "Title",
                 "Author",
-                9.90
+                9.90,
+                null
         );
 
         Set<ConstraintViolation<Book>> violations =
@@ -60,7 +62,8 @@ class BookValidationTests {
                 "0306406152",
                 "",
                 "Author",
-                9.90
+                9.90,
+                null
         );
 
         var violations = validator.validate(book);
@@ -76,7 +79,8 @@ class BookValidationTests {
                 "0306406152",
                 "Title",
                 "",
-                9.90
+                9.90,
+                null
         );
 
         var violations = validator.validate(book);
@@ -92,6 +96,7 @@ class BookValidationTests {
                 "0306406152",
                 "Title",
                 "Author",
+                null,
                 null
         );
 
@@ -108,7 +113,8 @@ class BookValidationTests {
                 "0306406152",
                 "Title",
                 "Author",
-                0.0
+                0.0,
+                null
         );
 
         var violations = validator.validate(book);
@@ -126,7 +132,8 @@ class BookValidationTests {
                 "0306406152",
                 "Title",
                 "Author",
-                9.90
+                9.90,
+                null
         );
 
         var violations = validator.validate(book);
@@ -140,7 +147,8 @@ class BookValidationTests {
                 "0306406153",
                 "Title",
                 "Author",
-                9.90
+                9.90,
+                null
         );
 
         var violations = validator.validate(book);
@@ -158,7 +166,8 @@ class BookValidationTests {
                 "9780306406157",
                 "Title",
                 "Author",
-                9.90
+                9.90,
+                null
         );
 
         var violations = validator.validate(book);
@@ -172,7 +181,8 @@ class BookValidationTests {
                 "9780306406158",
                 "Title",
                 "Author",
-                9.90
+                9.90,
+                null
         );
 
         var violations = validator.validate(book);

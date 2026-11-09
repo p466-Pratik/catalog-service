@@ -15,6 +15,11 @@ public class BookService {
         return bookRepository.findAll();
     }
 
+    public Iterable<Book> searchBooksByAuthor(String author) {
+        return bookRepository.findByAuthor(author);
+    }
+
+
     public Book viewBookDetails(String isbn) {
         return bookRepository.findByIsbn(isbn)
                 .orElseThrow(() -> new BookNotFoundException(isbn));
@@ -32,24 +37,27 @@ public class BookService {
         bookRepository.deleteByIsbn(isbn);
     }
     
-    public Book editBookDetails(String isbn, Book book) {
-        return bookRepository.findByIsbn(isbn)
-                .map(existing -> {
-                    var updated = new Book(
-                            existing.id(),
-                            existing.isbn(),
-                            book.title(),
-                            book.author(),
-                            book.price(),
-                            existing.createdDate(),
-                            existing.lastModifiedDate(),
-                            existing.version()
-                    );
+    
+public Book editBookDetails(String isbn, Book book) {
+    return bookRepository.findByIsbn(isbn)
+            .map(existing -> {
+                var updated = new Book(
+                        existing.id(),
+                        existing.isbn(),
+                        book.title(),
+                        book.author(),
+                        book.price(),
+                        book.publisher(),
+                        existing.createdDate(),
+                        existing.lastModifiedDate(),
+                        existing.version()
+                );
 
-                    return bookRepository.save(updated);
-                })
-                .orElseGet(() -> addBookToCatalog(book));
-    }
+                return bookRepository.save(updated);
+            })
+            .orElseGet(() -> addBookToCatalog(book));
+}
+
 
     public boolean existsByIsbn(String isbn) {
         return bookRepository.existsByIsbn(isbn);

@@ -19,6 +19,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
+
 @WebMvcTest(BookController.class)
 class BookControllerMvcTests {
 
@@ -96,7 +98,8 @@ class BookControllerMvcTests {
                                 isbn,
                                 "Updated",
                                 "Author",
-                                12.99
+                                12.99,
+                                null
                         )
                 );
 
@@ -130,7 +133,8 @@ class BookControllerMvcTests {
                                 isbn,
                                 "Created",
                                 "Author",
-                                12.99
+                                12.99,
+                                null
                         )
                 );
 
@@ -170,4 +174,38 @@ class BookControllerMvcTests {
         )
         .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void whenSearchingByAuthorThenReturnMatchingBooks() throws Exception {
+
+        String author = "Lyra Silverstar";
+
+        var book = Book.of(
+            "0306406152",
+            "Northern Lights",
+            author,
+            9.90,
+            "Polar Publishing"
+        );
+
+        given(bookService.searchBooksByAuthor(author))
+            .willReturn(List.of(book));
+
+        mockMvc.perform(
+            get("/books")
+                    .param("author", author)
+        )
+        .andExpect(status().isOk())
+        .andExpect(
+            org.springframework.test.web.servlet.result.MockMvcResultMatchers
+                    .jsonPath("$[0].isbn")
+                    .value("0306406152")
+        )
+        .andExpect(
+            org.springframework.test.web.servlet.result.MockMvcResultMatchers
+                    .jsonPath("$[0].author")
+                    .value("Lyra Silverstar")
+        );
+    }
+
 }

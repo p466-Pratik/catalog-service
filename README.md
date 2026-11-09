@@ -53,3 +53,14 @@ Example API commands and responses are documented in:
 ```text
 docs/api-demo.md
 ```
+
+## Practicum 2 — E1: Publisher Schema Migration
+
+The `publisher` field was added using the Flyway migration `V2__Add_publisher_column.sql`. The new column is initially nullable because existing books do not have a publisher value, and older versions of Catalog Service do not provide one. Making the column required immediately could break existing data and application instances.
+
+**Two-release migration plan:**
+
+1. **Release 1:** Add the nullable publisher column and update Catalog Service to support reading and writing publisher information. Existing application instances can continue working without providing a publisher.
+2. **Release 2:** After all application instances have been updated and existing books have publisher values, add validation requiring a publisher and create a new Flyway migration that adds the `NOT NULL` constraint.
+
+This approach allows the database schema and application to evolve without breaking older versions during deployment.

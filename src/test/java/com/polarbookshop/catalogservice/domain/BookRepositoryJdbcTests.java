@@ -36,7 +36,8 @@ class BookRepositoryJdbcTests {
                 isbn,
                 "Title",
                 "Author",
-                12.90
+                12.90,
+                null
         );
 
         jdbcAggregateTemplate.insert(book);
@@ -58,11 +59,11 @@ class BookRepositoryJdbcTests {
     @Test
     void findAllReturnsSavedBooks() {
         bookRepository.save(
-                Book.of("0306406152", "First Book", "Author One", 9.90)
+                Book.of("0306406152", "First Book", "Author One", 9.90, null)
         );
 
         bookRepository.save(
-                Book.of("9780306406157", "Second Book", "Author Two", 12.90)
+                Book.of("9780306406157", "Second Book", "Author Two", 12.90, null)
         );
 
         var books = bookRepository.findAll();
@@ -78,7 +79,8 @@ class BookRepositoryJdbcTests {
                 "0306406152",
                 "Title",
                 "Author",
-                9.90
+                9.90,
+                null
         );
 
         bookRepository.save(book);
@@ -99,7 +101,8 @@ class BookRepositoryJdbcTests {
                 "0306406152",
                 "Title",
                 "Author",
-                9.90
+                9.90,
+                null
         );
 
         bookRepository.save(book);
@@ -119,7 +122,8 @@ class BookRepositoryJdbcTests {
                 "0306406152",
                 "Title",
                 "Author",
-                9.90
+                9.90,
+                null
         );
 
         var savedBook = bookRepository.save(book);
@@ -128,5 +132,32 @@ class BookRepositoryJdbcTests {
         assertThat(savedBook.createdDate()).isNotNull();
         assertThat(savedBook.lastModifiedDate()).isNotNull();
     }
+    
+    @Test
+    void findBooksByAuthorReturnsMatchingBooks() {
+
+        var book1 = Book.of(
+            "0306406152",
+            "Northern Lights",
+            "Lyra Silverstar",
+            9.90,
+            "Polar Publishing"
+        );
+
+        var book2 = Book.of(
+            "9780306406157",
+            "Polar Journey",
+            "Iorek Polarson",
+            12.90,
+            "Arctic Books"
+        );
+
+        bookRepository.save(book1);
+        bookRepository.save(book2);
+
+        var results = bookRepository.findByAuthor("Lyra Silverstar");
+
+        assertThat(results).extracting(Book::isbn).containsExactly("0306406152");
+}
 
 }

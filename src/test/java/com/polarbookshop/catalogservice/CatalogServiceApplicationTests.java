@@ -29,7 +29,8 @@ class CatalogServiceApplicationTests {
                 isbn,
                 "Title",
                 "Author",
-                9.90
+                9.90,
+                null
         );
 
         try {
@@ -66,14 +67,16 @@ class CatalogServiceApplicationTests {
                 isbn,
                 "Original Title",
                 "Original Author",
-                9.90
+                9.90,
+                null
         );
 
         var updated = Book.of(
                 isbn,
                 "Updated Title",
                 "Updated Author",
-                14.90
+                14.90,
+                null
         );
 
         // POST - create book

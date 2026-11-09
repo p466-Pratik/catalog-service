@@ -29,6 +29,7 @@ class BookJsonTests {
                 "Title",
                 "Author",
                 9.90,
+                "Polar Publishing",
                 now,
                 now,
                 21
@@ -57,6 +58,10 @@ class BookJsonTests {
                 .isEqualTo(book.price());
 
         assertThat(content)
+                .extractingJsonPathStringValue("@.publisher")
+                .isEqualTo(book.publisher());
+
+        assertThat(content)
                 .extractingJsonPathStringValue("@.createdDate")
                 .isEqualTo(now.toString());
 
@@ -81,6 +86,7 @@ class BookJsonTests {
                   "title": "Title",
                   "author": "Author",
                   "price": 9.90,
+                  "publisher": "Polar Publishing",
                   "createdDate": "2026-10-01T10:15:30.000Z",
                   "lastModifiedDate": "2026-10-01T10:15:30.000Z",
                   "version": 21
@@ -96,10 +102,28 @@ class BookJsonTests {
                                 "Title",
                                 "Author",
                                 9.90,
+                                "Polar Publishing",
                                 instant,
                                 instant,
                                 21
                         )
                 );
+    }
+
+    @Test
+    void whenPublisherMissingThenDeserializeAsNull() throws Exception {
+
+        var content = """
+                {
+                  "isbn": "0306406152",
+                  "title": "Title",
+                  "author": "Author",
+                  "price": 9.90
+                }
+                """;
+
+        var book = json.parseObject(content);
+
+        assertThat(book.publisher()).isNull();
     }
 }

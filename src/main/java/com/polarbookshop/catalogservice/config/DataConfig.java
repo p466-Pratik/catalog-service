@@ -1,4 +1,3 @@
-
 package com.polarbookshop.catalogservice.config;
 
 import java.util.Optional;
@@ -7,8 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 @Configuration
@@ -18,9 +17,12 @@ public class DataConfig {
     @Bean
     AuditorAware<String> auditorAware() {
         return () -> Optional.ofNullable(
-                        SecurityContextHolder.getContext())
-                .map(SecurityContext::getAuthentication)
+                        SecurityContextHolder.getContext().getAuthentication())
                 .filter(Authentication::isAuthenticated)
-                .map(Authentication::getName);
+                .filter(authentication ->
+                        !(authentication instanceof AnonymousAuthenticationToken))
+                .map(Authentication::getName)
+                .filter(name -> !name.isBlank())
+                .or(() -> Optional.of("unknown"));
     }
 }

@@ -163,7 +163,7 @@ class BookRepositoryJdbcTests {
     }
 
     @Test
-    void whenBookCreatedWithoutAuthenticationThenAuditorsAreNull() {
+    void whenBookCreatedWithoutAuthenticationThenAuditorsAreUnknown() {
         var book = Book.of(
                 "0306406152",
                 "Unauthenticated Book",
@@ -174,8 +174,8 @@ class BookRepositoryJdbcTests {
 
         var savedBook = bookRepository.save(book);
 
-        assertThat(savedBook.createdBy()).isNull();
-        assertThat(savedBook.lastModifiedBy()).isNull();
+        assertThat(savedBook.createdBy()).isEqualTo("unknown");
+        assertThat(savedBook.lastModifiedBy()).isEqualTo("unknown");
     }
 
     @Test

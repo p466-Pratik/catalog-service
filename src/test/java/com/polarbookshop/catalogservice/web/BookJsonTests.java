@@ -32,6 +32,8 @@ class BookJsonTests {
                 "Polar Publishing",
                 now,
                 now,
+                "isabelle",
+                "isabelle",
                 21
         );
 
@@ -70,6 +72,14 @@ class BookJsonTests {
                 .isEqualTo(now.toString());
 
         assertThat(content)
+                .extractingJsonPathStringValue("@.createdBy")
+                .isEqualTo(book.createdBy());
+
+        assertThat(content)
+                .extractingJsonPathStringValue("@.lastModifiedBy")
+                .isEqualTo(book.lastModifiedBy());
+
+        assertThat(content)
                 .extractingJsonPathNumberValue("@.version")
                 .isEqualTo(book.version());
     }
@@ -89,6 +99,8 @@ class BookJsonTests {
                   "publisher": "Polar Publishing",
                   "createdDate": "2026-10-01T10:15:30.000Z",
                   "lastModifiedDate": "2026-10-01T10:15:30.000Z",
+                  "createdBy": "isabelle",
+                  "lastModifiedBy": "isabelle",
                   "version": 21
                 }
                 """;
@@ -105,6 +117,8 @@ class BookJsonTests {
                                 "Polar Publishing",
                                 instant,
                                 instant,
+                                "isabelle",
+                                "isabelle",
                                 21
                         )
                 );
@@ -125,5 +139,7 @@ class BookJsonTests {
         var book = json.parseObject(content);
 
         assertThat(book.publisher()).isNull();
+        assertThat(book.createdBy()).isNull();
+        assertThat(book.lastModifiedBy()).isNull();
     }
 }

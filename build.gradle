@@ -29,6 +29,11 @@ dependencies {
 	runtimeOnly 'org.postgresql:postgresql'
 	testImplementation 'org.testcontainers:postgresql'
 	testImplementation 'org.testcontainers:junit-jupiter'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.testcontainers:junit-jupiter'
+	testImplementation 'com.github.dasniko:testcontainers-keycloak:3.6.0'
 }
 
 tasks.named('test') {
@@ -37,4 +42,14 @@ tasks.named('test') {
 
 bootRun {
     systemProperty 'spring.profiles.active', 'testdata'
+}
+
+
+tasks.named('jar') {
+    enabled = false
+}
+
+bootBuildImage {
+    imageName = "${project.name}"
+    environment = ["BP_JVM_VERSION": "21"]
 }

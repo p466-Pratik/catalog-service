@@ -1,3 +1,4 @@
+
 package com.polarbookshop.catalogservice.domain;
 
 import java.util.Optional;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -54,7 +56,6 @@ class BookRepositoryJdbcTests {
                 bookRepository.findByIsbn("9780306406157")
         ).isEmpty();
     }
-
 
     @Test
     void findAllReturnsSavedBooks() {
@@ -132,24 +133,23 @@ class BookRepositoryJdbcTests {
         assertThat(savedBook.createdDate()).isNotNull();
         assertThat(savedBook.lastModifiedDate()).isNotNull();
     }
-    
+
     @Test
     void findBooksByAuthorReturnsMatchingBooks() {
-
         var book1 = Book.of(
-            "0306406152",
-            "Northern Lights",
-            "Lyra Silverstar",
-            9.90,
-            "Polar Publishing"
+                "0306406152",
+                "Northern Lights",
+                "Lyra Silverstar",
+                9.90,
+                "Polar Publishing"
         );
 
         var book2 = Book.of(
-            "9780306406157",
-            "Polar Journey",
-            "Iorek Polarson",
-            12.90,
-            "Arctic Books"
+                "9780306406157",
+                "Polar Journey",
+                "Iorek Polarson",
+                12.90,
+                "Arctic Books"
         );
 
         bookRepository.save(book1);
@@ -157,7 +157,41 @@ class BookRepositoryJdbcTests {
 
         var results = bookRepository.findByAuthor("Lyra Silverstar");
 
-        assertThat(results).extracting(Book::isbn).containsExactly("0306406152");
-}
+        assertThat(results)
+                .extracting(Book::isbn)
+                .containsExactly("0306406152");
+    }
 
+    @Test
+    void whenBookCreatedWithoutAuthenticationThenAuditorsAreNull() {
+        var book = Book.of(
+                "0306406152",
+                "Unauthenticated Book",
+                "Test Author",
+                9.90,
+                null
+        );
+
+        var savedBook = bookRepository.save(book);
+
+        assertThat(savedBook.createdBy()).isNull();
+        assertThat(savedBook.lastModifiedBy()).isNull();
+    }
+
+    @Test
+    @WithMockUser(username = "john")
+    void whenBookCreatedWithAuthenticationThenAuditorsAreSet() {
+        var book = Book.of(
+                "0306406152",
+                "Authenticated Book",
+                "Test Author",
+                9.90,
+                null
+        );
+
+        var savedBook = bookRepository.save(book);
+
+        assertThat(savedBook.createdBy()).isEqualTo("john");
+        assertThat(savedBook.lastModifiedBy()).isEqualTo("john");
+    }
 }

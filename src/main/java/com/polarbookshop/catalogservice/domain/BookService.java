@@ -1,3 +1,4 @@
+
 package com.polarbookshop.catalogservice.domain;
 
 import org.springframework.stereotype.Service;
@@ -19,7 +20,6 @@ public class BookService {
         return bookRepository.findByAuthor(author);
     }
 
-
     public Book viewBookDetails(String isbn) {
         return bookRepository.findByIsbn(isbn)
                 .orElseThrow(() -> new BookNotFoundException(isbn));
@@ -36,28 +36,28 @@ public class BookService {
     public void removeBookFromCatalog(String isbn) {
         bookRepository.deleteByIsbn(isbn);
     }
-    
-    
-public Book editBookDetails(String isbn, Book book) {
-    return bookRepository.findByIsbn(isbn)
-            .map(existing -> {
-                var updated = new Book(
-                        existing.id(),
-                        existing.isbn(),
-                        book.title(),
-                        book.author(),
-                        book.price(),
-                        book.publisher(),
-                        existing.createdDate(),
-                        existing.lastModifiedDate(),
-                        existing.version()
-                );
 
-                return bookRepository.save(updated);
-            })
-            .orElseGet(() -> addBookToCatalog(book));
-}
+    public Book editBookDetails(String isbn, Book book) {
+        return bookRepository.findByIsbn(isbn)
+                .map(existing -> {
+                    var updated = new Book(
+                            existing.id(),
+                            existing.isbn(),
+                            book.title(),
+                            book.author(),
+                            book.price(),
+                            book.publisher(),
+                            existing.createdDate(),
+                            existing.lastModifiedDate(),
+                            existing.createdBy(),
+                            existing.lastModifiedBy(),
+                            existing.version()
+                    );
 
+                    return bookRepository.save(updated);
+                })
+                .orElseGet(() -> addBookToCatalog(book));
+    }
 
     public boolean existsByIsbn(String isbn) {
         return bookRepository.existsByIsbn(isbn);
